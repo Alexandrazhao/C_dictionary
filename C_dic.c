@@ -22,36 +22,41 @@ int load() {} //loads all the words from the file they are saved in by save() so
 int save() {} //updates the file with any changes to the dictionary so that the state can be 
        //saved in between instances of the process
 
-Int remove(char* word){} // remove the word based on the actual word
+int remove(char* word){} // remove the word based on the actual word
 
 int remove(char* ID){} // remove the word based on the ID
 
+int start() {} // starts the user side of the program, so that the user can interact with the program. Calls load()
 
+int end() {} // ends the user side of the program, calls save()
 
-int remove(word){} //remove the word based on the actual word
+//----------------------------------PSEUDOCODE------------------------------------
 
-If (search(word) == word):{           //search the word and delete it
-remove(ID);
-pop(word); // maybe using the pop() function here to remove the word
-Return 0   //if success
+int remove(word){ //remove the word based on the actual word
+   if (search(word) == word){           //search the word and delete it
+      remove(ID);
+      pop(word); // maybe using the pop() function here to remove the word
+      return 0   //if success
+   } else if (word is not found OR the list is empty){ 
+    return 1(error)
+   }
 }
-Else If (word is not found OR the list is empty): 
-return 1(error) // 
 
 
 
-Int remove (int ID){} // remove the word regarding its id
-If (search(word)==word):{ //search the word id and delete it
-remove(word);
-pop(ID); //using pop() function to remove the word
-Return 0 //success
+int remove (int ID){ // remove the word regarding its id
+   if (search(word)==word):{ //search the word id and delete it
+      remove(word);
+      pop(ID); //using pop() function to remove the word
+      return 0 //success
+   }else if (ID is not found OR list is empty){
+      return 1 //wrong 
+   }
 }
-Else if (ID is not found OR list is empty):
-Return 1 //wrong 
 
 
-Int add (char[]* word, char[]* def, struct* dict){
-    If (1){
+int add (char[]* word, char[]* def, struct* dict){
+    if (1){
         Dict.current = dict.current + 1;
         
         Dict.array[dict.current][0] = word;
@@ -68,13 +73,13 @@ Int add (char[]* word, char[]* def, struct* dict){
 
 
 Struct Pair{
-*char key;
-Int value;
+   *char key;
+   int value;
 }Pair
 
 Struct Dictionary{
-Pair* first;
-Struct Dictionary* second;
+   Pair* first;
+   Struct Dictionary* second;
 }Dictionary
 
 //construct an empty dictionary
