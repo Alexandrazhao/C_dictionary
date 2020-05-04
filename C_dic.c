@@ -72,14 +72,14 @@ int add (char[]* word, char[]* def, struct* dict){
 }
 
 
-Struct Pair{
-   *char key;
-   int value;
+struct Pair{
+   *char word;
+   *char definition;
 }Pair
 
-Struct Dictionary{
+struct Dictionary{
    Pair* first;
-   Struct Dictionary* second;
+   struct Dictionary* second;
 }Dictionary
 
 //construct an empty dictionary - with malloc
