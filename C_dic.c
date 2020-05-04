@@ -105,3 +105,13 @@ if(_dict == 0){
     *prev.second = new;
 }
 }
+
+int main(int argc, char *argv[]){
+    Dictionary* d = dict();
+    load();
+    int val = get_dict();
+    if (val == -1){
+        
+    }
+
+}
