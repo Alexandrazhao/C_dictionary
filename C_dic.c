@@ -111,10 +111,12 @@ if(_dict == 0){
 }
 }
 
+in
+
 int main(int argc, char *argv[]){
     Dictionary* d = dict();
     load();
-    save();
+    start();
     end();
     
     //int val = get_dict();
