@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 int add(char* word, char*def){} // adds a new word with a definition assigned to it; returns 1 on 
-   //error, 0 on success
+   //error, 0 on success; if there is no dictionary it creates
 
 int add (char* word){} //adds a new word with null definition; returns 1 on error, 0 on success
 
@@ -82,7 +82,7 @@ Struct Dictionary{
    Struct Dictionary* second;
 }Dictionary
 
-//construct an empty dictionary
+//construct an empty dictionary - with malloc
 Dictionary* dict(){
 Dictionary* d = (Dictionary*) malloc (sizeof(Dictionary));
 *d.first = NULL;
