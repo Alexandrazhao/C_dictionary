@@ -114,8 +114,11 @@ if(_dict == 0){
 int main(int argc, char *argv[]){
     Dictionary* d = dict();
     load();
-    int val = get_dict();
-    if (val == -1){
+    save();
+    end();
+    
+    //int val = get_dict();
+    //if (val == -1){
         
     }
 
