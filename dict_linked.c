@@ -32,10 +32,11 @@ Dictionary* dict(){
 }
 
 int dict_get(Dictionary* d, char* key){
-    printf("%s Firday", key);
+    printf("inside dict_get(), key:%s", key);
     if(d-> first == NULL){
         return -1;
     }
+    printf("inside dict_get(), after if statement");
     Dictionary* tmp = d;
     while(tmp != NULL){
         if(strcmp((tmp->first)->key, key) == 0){
@@ -56,8 +57,8 @@ int main(int argc, char *argv[]){
     size_t len = 0;
     while((read = getline(&line, &len, fd))!= -1){
         char* token = strtok(line, "\t");
-        //printf("%s", token);
-        printf("%d", dict_get(d, token));
+        printf("inside main(), Token: %s\n", token);
+        printf("inside main(), return of dict_get(): %d\n", dict_get(d, token));
     
     }
     //close(fd);
