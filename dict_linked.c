@@ -31,6 +31,42 @@ Dictionary* dict(){
     return d; 
 }
 
+void dict_add(Dictionary* d, char* key, char* def){
+    
+    if(key == NULL || def == NULL){
+        printf("You cannot use null keys and definitions\n");
+        return;
+    }
+    //create a Pair buy key and the value
+    Pair* pair = newPair(key, def);
+    //if the dict is empty
+    if(d->first == NULL){
+        d->first = pair;
+        return 0;
+    }
+    //create a var to keep track if a key is already existed in the dictionary
+    int in_dict = 0;
+    //loop through the dictionary
+    Dictionary* tmp = d;
+    Dictionary* prev = NULL;
+    while (tmp != NULL && in_dict==0){
+        if(strcmp((tmp->first)->key, key) == 0){
+            in_dict = 1;
+            (tmp->first)->value = val;
+        }
+        prev = tmp;
+        tmp = tmp->second;
+    }
+    //if a key hasn't been found when we create a new node with first
+    if(in_dict == 0){
+        Dictionary* new = dict();
+        new->first =pair;
+        new->second =NULL;
+        prev->second = new;
+    }
+}
+
+
 int dict_get(Dictionary* d, char* key){
     printf("inside dict_get(), key:%s", key);
     if(d-> first == NULL){
@@ -59,11 +95,10 @@ int main(int argc, char *argv[]){
         char* token = strtok(line, "\t");
         printf("inside main(), Token: %s\n", token);
         printf("inside main(), return of dict_get(): %d\n", dict_get(d, token));
-    
+        printf("%s", dict_get_new(d, token));
     }
     //close(fd);
     return 0;
 }
-
 
 
