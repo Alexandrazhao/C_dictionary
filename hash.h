@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 int hash_add(char* word, char*def){} // adds a new word with a definition assigned to it; returns 1 on 
    //error, 0 on success; if there is no dictionary it creates
