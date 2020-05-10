@@ -67,11 +67,11 @@ int createID(char* key){
 }
 
 /*
-    Takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d)
-    and the definition that is supposed to be associated with the word (char* def) and it stores that as a new Pair
-    "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
+    Takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d),
+    the definition that is supposed to be associated with the word (char* def) and the ID (int ID) and it stores
+    that as a new Pair "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
 */
-int dict_add(Dictionary* d, char* key, char* def){
+int dict_add(Dictionary* d, char* key, char* def, int ID){
     
     //makes sure the key is not null
     if(key == NULL){
@@ -79,13 +79,15 @@ int dict_add(Dictionary* d, char* key, char* def){
         return -1;
     }
     
+    //if the ID is NULL, give a proper ID
+    if(ID == NULL){
+        return dict_add(d,key,def, createID(key));
+    }
+    
     //if the definition specified is NULL, sets it to STANDARD_DEF
     if(def == null){
         return dict_add(d,key,STANDARD_DEF);
     }
-    
-    //create the ID associated with the key
-    int tempID = createID(key);
     
     //create a new pair with the key and def specified
     Pair* pair = newPair(key, def, tempID);
@@ -109,6 +111,20 @@ int dict_add(Dictionary* d, char* key, char* def){
 }
 
 /*
+   like regular dict_add(), but creates a new ID for the word
+*/
+int dict_add(Dictionary* d, char* key, char* def){
+    dict_add(d,key,def,createID(key));
+}
+
+/*
+   like regular dict_add(), but sets the definition to STANDARD_DEF
+*/
+int dict_add(Dictionary* d, char* key, int ID){
+    dict_add(d,key,STANDARD_DEF,ID));
+}
+
+/*
     Searches for a word with the key (char* key) in the dictionary (Dictionary* d). Returns
 */
 int dict_search(Dictionary* d, char* key){
@@ -127,10 +143,22 @@ int dict_search(Dictionary* d, char* key){
     return -1;
 }
 
+/*
+    Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
+    be accessed (char* filename) and stores all of the words present in the file in the dictionary, and sets
+    all definitions equal to STANDARD_DEF. Returns 0 upon success and -1 when an error has arised. 
+    Does not require a specific format.
+    
+    USAGE: processing large text files with no "dictionary format"
+*/
+int loadText(Dictionary* d, char* filename){
+    return -1;
+}
+
 /* 
     Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
     be accessed (char* filename) and stores all of the words present in the file in the dictionary. Returns
-    0 upon success and -1 when an error has arised.
+    0 upon success and -1 when an error has arised. Requires a specific format.
     
     USAGE: should be used to process a large file containing words and definitions in the following format:
     key: definition\n
@@ -170,10 +198,18 @@ int load(Dictionary* d, char* filename){
     }
     return 0;
 }
+/*
+    Saves the given dictionary (Dictionary* d) in a file so it's accessible throughout instances of the program
+*/
+int save(Dictionary* d){
+    /*TO-DO: write a method that saves the dictionary in the following format:
+    "key: definition: ID\n"
+    */
+    return 0;
+}
 
 /*
-    Takes in an instance of the dictionary (Dictionary* d),and stores all of the words present 
-    in the dictionary specified. Returns 0 upon success and -1 when an error has arised.
+    like regular load, but stores the Dictionary in a standard file FILENAME
     
     USAGE: should be used to load the dictionary from a different instance of the process.
 */
@@ -185,6 +221,9 @@ int load(Dictionary* d){
 int main(int argc, char *argv[]){
     //create an "instance" of the dictionary
     Dictionary* d = dict();
+    
+    //load all the words from a previous instance of the program
+    //load(d);
     
     //load the words from the file "test.txt" into the created dictionary
     char* fileName = "test.txt";
