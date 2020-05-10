@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-public final char* DELIM = ":\t";
-public final char* FILENAME = "test.txt"; //change it to the file that is gonna be used for storing our info bw instances of the process
-public final char* STANDARD_DEF = "(No definition specified)";
+#define DELIM ":\t"
+#define FILENAME  "test.txt"
+#define STANDARD_DEF "(No definition specified)"
+/*
+public static char* DELIM = ":\t";
+public static char* FILENAME = "test.txt"; //change it to the file that is gonna be used for storing our info bw instances of the process
+public static char* STANDARD_DEF = "(No definition specified)";
+*/
 
 //struct for a pair for a key and a value
 typedef struct Pair{
@@ -21,8 +25,8 @@ typedef struct Dictionary{
 
 Pair* newPair(char* key, char* def, int ID) { 
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
-    p->myKey = (char*)malloc(100* sizeof(k));
-    p->myDef = (char*)malloc(100* sizeof(d));
+    p->myKey = (char*)malloc(sizeof(key));
+    p->myDef = (char*)malloc(sizeof(def));
     
     printf("in newPair(), before, p->myKey: %s, key: %s \n", p->myKey, key);
     printf("in newPair(), before, p->myDef: %s, def: %s \n", p->myDef, def);
@@ -81,16 +85,16 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
     
     //if the ID is NULL, give a proper ID
     if(ID == NULL){
-        return dict_add(d,key,def, createID(key));
+        return dict_add_id(d,key,def);
     }
     
     //if the definition specified is NULL, sets it to STANDARD_DEF
-    if(def == null){
-        return dict_add(d,key,STANDARD_DEF);
+    if(def == NULL){
+        return dict_add_id(d,key,STANDARD_DEF);
     }
     
     //create a new pair with the key and def specified
-    Pair* pair = newPair(key, def, tempID);
+    Pair* pair = newPair(key, def, ID);
     printf("inside dict_add(), before adding");
     
     //handles the empty dictionary case
@@ -98,7 +102,7 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
         printf("inside main(), case: first obj");
         d->first = pair;
         return 0;
-    } else //handles any other case{ 
+    } else { //handles any other case
         
         printf("inside main(), case: second obj");
         Dictionary* new = dict();
@@ -113,15 +117,15 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
 /*
    like regular dict_add(), but creates a new ID for the word
 */
-int dict_add(Dictionary* d, char* key, char* def){
+int dict_add_id(Dictionary* d, char* key, char* def){
     dict_add(d,key,def,createID(key));
 }
 
 /*
    like regular dict_add(), but sets the definition to STANDARD_DEF
 */
-int dict_add(Dictionary* d, char* key, int ID){
-    dict_add(d,key,STANDARD_DEF,ID));
+int dict_add_def(Dictionary* d, char* key, int ID){
+    dict_add(d,key,STANDARD_DEF,ID);
 }
 
 /*
@@ -180,16 +184,17 @@ int load(Dictionary* d, char* filename){
         
         //... tokenize it based on the DELIM dividers...
         char* key = strtok(line, DELIM);
-        printf("STRTOK TEST: key= %d\n",key);
+        printf("STRTOK TEST: key= %s\n",key);
         char* def = strtok(NULL, DELIM);
-        
+        printf("%s", def);
+    
         if(def == NULL){
             def = STANDARD_DEF;
         }
         
         //...and then add them into the dictionary.
-        int tempReturn = dict_add(d, key, def);
-        if( tempReturn == -1){
+        int tempReturn = dict_add_id(d, key, def);
+        if( tempReturn < 0){
             printf("ERROR in load(), in dict_add()");
         }
         
@@ -209,11 +214,11 @@ int save(Dictionary* d){
 }
 
 /*
-    like regular load, but stores the Dictionary in a standard file FILENAME
+    like regular load, but load the Dictionary in a standard file FILENAME
     
     USAGE: should be used to load the dictionary from a different instance of the process.
 */
-int load(Dictionary* d){
+int load_std(Dictionary* d){
     return load(d, FILENAME);
 }
 
