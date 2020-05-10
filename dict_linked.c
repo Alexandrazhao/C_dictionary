@@ -52,7 +52,6 @@ int createID(char* key){
 }
 
 void dict_add(Dictionary* d, char* key, char* def){
-    
     if(key == NULL || def == NULL){
         printf("ERROR: either the key or the definition is NULL\n");
         return -1;
@@ -61,12 +60,14 @@ void dict_add(Dictionary* d, char* key, char* def){
     //create a Pair buy key and the value
     int tempID = createID(key);
     Pair* pair = newPair(key, def, tempID);
-    
+    printf("inside dict_add(), before adding");
     //if the dict is empty
     if(d->first == NULL){
+        printf("inside main(), case: first obj");
         d->first = pair;
         return 0;
     } else {
+        printf("inside main(), case: second obj");
         Dictionary* new = dict();
         new->first =pair;
         new->second =NULL;
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]){
         char* def = strotok(token,"\t");
         printf("inside main(), key: %s, def: %s\n", key);
         printf("inside main(), return of dict_get(): %d\n", dict_add(d, key, def));
-        printf("%s", dict_get_new(d, token));
+        //printf("%s", dict_get_new(d, token));
     }
     //close(fd);
     return 0;
