@@ -5,7 +5,8 @@
 //struct for a pair for a key and a value
 typedef struct Pair{
     char* key;
-    int value;
+    char* value;
+    int ID;
 }Pair;
 
 typedef struct Dictionary{
@@ -31,19 +32,8 @@ Dictionary* dict(){
     return d; 
 }
 
-void dict_add(Dictionary* d, char* key, char* def){
-    
-    if(key == NULL || def == NULL){
-        printf("You cannot use null keys and definitions\n");
-        return;
-    }
-    //create a Pair buy key and the value
-    Pair* pair = newPair(key, def);
-    //if the dict is empty
-    if(d->first == NULL){
-        d->first = pair;
-        return 0;
-    }
+int createID(char* key){
+    /*
     //create a var to keep track if a key is already existed in the dictionary
     int in_dict = 0;
     //loop through the dictionary
@@ -57,12 +47,31 @@ void dict_add(Dictionary* d, char* key, char* def){
         prev = tmp;
         tmp = tmp->second;
     }
-    //if a key hasn't been found when we create a new node with first
-    if(in_dict == 0){
+    */
+    return 20;
+}
+
+void dict_add(Dictionary* d, char* key, char* def){
+    
+    if(key == NULL || def == NULL){
+        printf("ERROR: either the key or the definition is NULL\n");
+        return -1;
+    }
+    
+    //create a Pair buy key and the value
+    int tempID = createID(key);
+    Pair* pair = newPair(key, def, tempID);
+    
+    //if the dict is empty
+    if(d->first == NULL){
+        d->first = pair;
+        return 0;
+    } else {
         Dictionary* new = dict();
         new->first =pair;
         new->second =NULL;
         prev->second = new;
+        return 0;
     }
 }
 
@@ -92,9 +101,11 @@ int main(int argc, char *argv[]){
     ssize_t read;
     size_t len = 0;
     while((read = getline(&line, &len, fd))!= -1){
-        char* token = strtok(line, "\t");
-        printf("inside main(), Token: %s\n", token);
-        printf("inside main(), return of dict_get(): %d\n", dict_get(d, token));
+        char* token = strtok(line, "\t"); //key: def
+        char* key = strtok(token, ":");
+        char* def = strotok(token,"\t");
+        printf("inside main(), key: %s, def: %s\n", key);
+        printf("inside main(), return of dict_get(): %d\n", dict_add(d, key, def));
         printf("%s", dict_get_new(d, token));
     }
     //close(fd);
