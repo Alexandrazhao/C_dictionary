@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 public final char* DELIM = ":\t";
-public final char* FILENAME = "test.txt";
+public final char* FILENAME = "test.txt"; //change it to the file that is gonna be used for storing our info bw instances of the process
+public final char* STANDARD_DEF = "(No definition specified)";
 
 //struct for a pair for a key and a value
 typedef struct Pair{
@@ -66,26 +67,37 @@ int createID(char* key){
 }
 
 /*
-A function that takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d)
+    Takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d)
     and the definition that is supposed to be associated with the word (char* def) and it stores that as a new Pair
     "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
 */
 int dict_add(Dictionary* d, char* key, char* def){
-    if(key == NULL || def == NULL){
+    
+    //makes sure the key is not null
+    if(key == NULL){
         printf("ERROR: either the key or the definition is NULL\n");
         return -1;
     }
     
-    //create a Pair buy key and the value
+    //if the definition specified is NULL, sets it to STANDARD_DEF
+    if(def == null){
+        return dict_add(d,key,STANDARD_DEF);
+    }
+    
+    //create the ID associated with the key
     int tempID = createID(key);
+    
+    //create a new pair with the key and def specified
     Pair* pair = newPair(key, def, tempID);
     printf("inside dict_add(), before adding");
-    //if the dict is empty
+    
+    //handles the empty dictionary case
     if(d->first == NULL){
         printf("inside main(), case: first obj");
         d->first = pair;
         return 0;
-    } else {
+    } else //handles any other case{ 
+        
         printf("inside main(), case: second obj");
         Dictionary* new = dict();
         Dictionary* prev = NULL;
@@ -96,9 +108,11 @@ int dict_add(Dictionary* d, char* key, char* def){
     }
 }
 
-
-int dict_get(Dictionary* d, char* key){
-    printf("inside dict_get(), key:%s", key);
+/*
+    Searches for a word with the key (char* key) in the dictionary (Dictionary* d). Returns
+*/
+int dict_search(Dictionary* d, char* key){
+    printf("inside dict_search(), key:%s", key);
     if(d-> first == NULL){
         return -1;
     }
@@ -112,10 +126,12 @@ int dict_get(Dictionary* d, char* key){
     }
     return -1;
 }
+
 /* 
-    A function that takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
-    be accessed (char* filename) and stores all of the words present in the file in the dictionary specified. Returns
+    Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
+    be accessed (char* filename) and stores all of the words present in the file in the dictionary. Returns
     0 upon success and -1 when an error has arised.
+    
     USAGE: should be used to process a large file containing words and definitions in the following format:
     key: definition\n
 */
@@ -140,7 +156,7 @@ int load(Dictionary* d, char* filename){
         char* def = strtok(NULL, DELIM);
         
         if(def == NULL){
-            def = "(No definition specified)";
+            def = STANDARD_DEF;
         }
         
         //...and then add them into the dictionary.
@@ -156,8 +172,9 @@ int load(Dictionary* d, char* filename){
 }
 
 /*
-    A function that takes in an instance of the dictionary (Dictionary* d),and stores all of the words present 
+    Takes in an instance of the dictionary (Dictionary* d),and stores all of the words present 
     in the dictionary specified. Returns 0 upon success and -1 when an error has arised.
+    
     USAGE: should be used to load the dictionary from a different instance of the process.
 */
 int load(Dictionary* d){
