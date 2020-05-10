@@ -5,7 +5,7 @@
 //struct for a pair for a key and a value
 typedef struct Pair{
     char* key;
-    char* value;
+    char* def;
     int ID;
 }Pair;
 
@@ -15,12 +15,15 @@ typedef struct Dictionary{
 }Dictionary;
 
 
-Pair* newPair(char* k, int val) { 
+Pair* newPair(char* k, char* d, int ID) { 
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
-    p->key = (char*)malloc(sizeof(k));
+    p->key = (char*)malloc(100* sizeof(k));
+    p->def = (char*)malloc(100* sizeof(d));
     strncat(p->key, k, strlen(k));
+    strncat(p->def, d, strlen(d));
+    //free(d);
     free(k);
-    p->value = val; 
+    p->def = d; 
     return p; 
 } 
 
@@ -51,7 +54,7 @@ int createID(char* key){
     return 20;
 }
 
-void dict_add(Dictionary* d, char* key, char* def){
+int dict_add(Dictionary* d, char* key, char* def){
     if(key == NULL || def == NULL){
         printf("ERROR: either the key or the definition is NULL\n");
         return -1;
@@ -69,6 +72,7 @@ void dict_add(Dictionary* d, char* key, char* def){
     } else {
         printf("inside main(), case: second obj");
         Dictionary* new = dict();
+        Dictionary* prev = NULL;
         new->first =pair;
         new->second =NULL;
         prev->second = new;
@@ -86,7 +90,7 @@ int dict_get(Dictionary* d, char* key){
     Dictionary* tmp = d;
     while(tmp != NULL){
         if(strcmp((tmp->first)->key, key) == 0){
-            return (tmp->first)->value;
+            return (tmp->first)->def;
         }
         tmp = tmp->second;
     }
@@ -104,7 +108,7 @@ int main(int argc, char *argv[]){
     while((read = getline(&line, &len, fd))!= -1){
         char* token = strtok(line, "\t"); //key: def
         char* key = strtok(token, ":");
-        char* def = strotok(token,"\t");
+        char* def = strtok(token,"\t");
         printf("inside main(), key: %s, def: %s\n", key);
         printf("inside main(), return of dict_get(): %d\n", dict_add(d, key, def));
         //printf("%s", dict_get_new(d, token));
@@ -112,5 +116,7 @@ int main(int argc, char *argv[]){
     //close(fd);
     return 0;
 }
+
+
 
 
