@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+public final char* DELIM = ":\t";
+public final char* FILENAME = "test.txt";
+
 //struct for a pair for a key and a value
 typedef struct Pair{
     char* key;
@@ -109,15 +112,16 @@ int dict_get(Dictionary* d, char* key){
 int main(int argc, char *argv[]){
     Dictionary* d = dict();
     
-    FILE *fd1 = fopen("test.txt", "r");
-    if(fd1 == NULL){exit(EXIT_FAILURE);}
-    char *line1 = NULL;
-    ssize_t read1;
-    size_t len1 = 0;
+    FILE *fd = fopen(FILENAME, "r");
+    if(fd == NULL){exit(EXIT_FAILURE);}
+    char *line = NULL;
+    ssize_t read;
+    size_t len = 0;
     while((read = getline(&line, &len, fd))!= -1){
         
-        char* key = strtok(line, ":"); // token = "key: def"
-        char* def = strtok(NULL, "\t");
+        char* key = strtok(line, DELIM);
+        printf("STRTOK TEST: key= %d\n",key);
+        char* def = strtok(NULL, DELIM);
         
         printf("inside main(), key: %s, def: %s\n", key, def);
         printf("inside main(), return of dict_get(): %d\n", dict_add(d, key, def));
