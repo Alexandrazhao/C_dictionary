@@ -20,14 +20,14 @@ Pair* newPair(char* k, char* d, int ID) {
     p->key = (char*)malloc(100* sizeof(k));
     p->def = (char*)malloc(100* sizeof(d));
     
-    printf("in newPair(), before, p->key: %d, k: %d", p->key, k);
-    printf("in newPair(), before, p->def: %d, d: %d", p->def, d);
+    printf("in newPair(), before, p->key: %s, k: %s \n", p->key, k);
+    printf("in newPair(), before, p->def: %s, d: %s \n", p->def, d);
     
     strncat(p->key, k, strlen(k));
     strncat(p->def, d, strlen(d));
     
-    printf("in newPair(), after, p->key: %d, k: %d", p->key, k);
-    printf("in newPair(), after, p->def: %d, d: %d", p->def, d);
+    printf("in newPair(), after, p->key: %s, k: %s \n", p->key, k);
+    printf("in newPair(), after, p->def: %s, d: %s \n", p->def, d);
     
     //free(d);
     free(k);
@@ -114,10 +114,9 @@ int main(int argc, char *argv[]){
     ssize_t read;
     size_t len = 0;
     while((read = getline(&line, &len, fd))!= -1){
-        char* token = strtok(line, "\t"); //key: def
-        char* key = strtok(token, ":");
-        char* def = strtok(token,"\t");
-        printf("inside main(), key: %s, def: %s\n", key);
+        char* key = strtok(line, "\t"); //key: def
+        char* def = strtok(line, "\t");
+        printf("inside main(), key: %s, def: %s\n", key, def);
         printf("inside main(), return of dict_get(): %d\n", dict_add(d, key, def));
         //printf("%s", dict_get_new(d, token));
     }
