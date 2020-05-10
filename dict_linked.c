@@ -19,8 +19,16 @@ Pair* newPair(char* k, char* d, int ID) {
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
     p->key = (char*)malloc(100* sizeof(k));
     p->def = (char*)malloc(100* sizeof(d));
+    
+    printf("in newPair(), before, p->key: %d, k: %d", p->key, k);
+    printf("in newPair(), before, p->def: %d, d: %d", p->def, d);
+    
     strncat(p->key, k, strlen(k));
     strncat(p->def, d, strlen(d));
+    
+    printf("in newPair(), after, p->key: %d, k: %d", p->key, k);
+    printf("in newPair(), after, p->def: %d, d: %d", p->def, d);
+    
     //free(d);
     free(k);
     p->def = d; 
