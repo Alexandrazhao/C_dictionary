@@ -108,14 +108,17 @@ int dict_get(Dictionary* d, char* key){
 
 int main(int argc, char *argv[]){
     Dictionary* d = dict();
-    FILE *fd = fopen("test.txt", "r");
-    if(fd == NULL){exit(EXIT_FAILURE);}
-    char *line = NULL;
-    ssize_t read;
-    size_t len = 0;
+    
+    FILE *fd1 = fopen("test.txt", "r");
+    if(fd1 == NULL){exit(EXIT_FAILURE);}
+    char *line1 = NULL;
+    ssize_t read1;
+    size_t len1 = 0;
     while((read = getline(&line, &len, fd))!= -1){
-        char* key = strtok(line, "\t"); //key: def
-        char* def = strtok(line, "\t");
+        
+        char* key = strtok(line, ":"); // token = "key: def"
+        char* def = strtok(NULL, "\t");
+        
         printf("inside main(), key: %s, def: %s\n", key, def);
         printf("inside main(), return of dict_get(): %d\n", dict_add(d, key, def));
         //printf("%s", dict_get_new(d, token));
