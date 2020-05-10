@@ -24,6 +24,7 @@ typedef struct Dictionary{
 
 
 Pair* newPair(char* key, char* def, int ID) { 
+    printf("in newPair() before malloc; :%s, %s\n", key, def);
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
     p->myKey = (char*)malloc(sizeof(key));
     p->myDef = (char*)malloc(sizeof(def));
@@ -76,6 +77,7 @@ int createID(char* key){
     that as a new Pair "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
 */
 int dict_add(Dictionary* d, char* key, char* def, int ID){
+    printf("in dict_add(); :%s, %s\n", key, def);
     
     //makes sure the key is not null
     if(key == NULL){
@@ -94,6 +96,7 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
     }
     
     //create a new pair with the key and def specified
+    printf("in dict_add() #2; :%s, %s\n", key, def);
     Pair* pair = newPair(key, def, ID);
     printf("inside dict_add(), before adding");
     
@@ -118,6 +121,7 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
    like regular dict_add(), but creates a new ID for the word
 */
 int dict_add_id(Dictionary* d, char* key, char* def){
+    printf("in dict_add_id(); :%s, %s\n", key, def);
     dict_add(d,key,def,createID(key));
 }
 
