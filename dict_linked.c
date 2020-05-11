@@ -26,23 +26,22 @@ typedef struct Dictionary{
 Pair* newPair(char* key, char* def, int ID) { 
     printf("in newPair() before malloc; :%s, %s\n", key, def);
     //size_t size_to_allocate = A_MEGABYTE;
-    Pair* p =  (Pair*)malloc(1000*sizeof(Pair)+1); 
-    p->myKey = (char*)malloc(1000*sizeof(key)+1);
-    p->myDef = (char*)malloc(1000*sizeof(def)+1);
+    Pair* p =  (Pair*)malloc(sizeof(Pair)); 
+    p->myKey = (char*)malloc(sizeof(key));
+    p->myDef = (char*)malloc(sizeof(def));
     
     printf("in newPair(), before, p->myKey: %s, key: %s \n", p->myKey, key);
     printf("in newPair(), before, p->myDef: %s, def: %s \n", p->myDef, def);
     
     strncat(p->myKey, key, strlen(key));
     strncat(p->myDef, def, strlen(def));
-    //free(key);
     p->myKey = key;
     //free(def);
-    //p->myDef = def;
+    p->myDef = def;
     printf("in newPair(), after, p->myKey: %s, key: %s \n", p->myKey, key);
     printf("in newPair(), after, p->myDef: %s, def: %s \n", p->myDef, def);
     return p; 
-    free(key);
+    
 } 
 
 
@@ -70,28 +69,6 @@ int createID(char* key){
     }
     */
     return 20;
-}
-
-
-void dict_free(Dictionary* d){
-    Dictionary* h = d;
-	Dictionary* prev = NULL;
-	while (h->second != NULL){
-		prev = h;
-		h = h->second;
-	}
-	free((h->first)->myKey);
-	free(h->first);
-	free(h);
-	if(prev != NULL){
-		prev->second = NULL;
-		dict_free(d);
-	}else{
-		Pair* to_free = d->first;
-		d->first = NULL;
-		d->second = NULL;
-	}
-
 }
 
 /*
@@ -273,10 +250,7 @@ int main(int argc, char *argv[]){
     //load the words from the file "test.txt" into the created dictionary
     char* fileName = "test.txt";
     load(d, fileName);
-    dict_free(d);
+    //dict_free(d);
     //close(fd);
     return 0;
 }
-
-
-
