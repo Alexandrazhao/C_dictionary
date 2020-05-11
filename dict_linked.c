@@ -25,23 +25,24 @@ typedef struct Dictionary{
 
 Pair* newPair(char* key, char* def, int ID) { 
     printf("in newPair() before malloc; :%s, %s\n", key, def);
-    Pair* p =  (Pair*)malloc(sizeof(Pair)); 
-    p->myKey = (char*)malloc(sizeof(key));
-    p->myDef = (char*)malloc(sizeof(def));
+    //size_t size_to_allocate = A_MEGABYTE;
+    Pair* p =  (Pair*)malloc(1000*sizeof(Pair)+1); 
+    p->myKey = (char*)malloc(1000*sizeof(key)+1);
+    p->myDef = (char*)malloc(1000*sizeof(def)+1);
     
     printf("in newPair(), before, p->myKey: %s, key: %s \n", p->myKey, key);
     printf("in newPair(), before, p->myDef: %s, def: %s \n", p->myDef, def);
     
     strncat(p->myKey, key, strlen(key));
     strncat(p->myDef, def, strlen(def));
-    
+    //free(key);
+    p->myKey = key;
+    //free(def);
+    //p->myDef = def;
     printf("in newPair(), after, p->myKey: %s, key: %s \n", p->myKey, key);
     printf("in newPair(), after, p->myDef: %s, def: %s \n", p->myDef, def);
-    
-    //free(d);
-    free(key);
-    p->myDef = def; 
     return p; 
+    free(key);
 } 
 
 
@@ -71,6 +72,28 @@ int createID(char* key){
     return 20;
 }
 
+
+void dict_free(Dictionary* d){
+    Dictionary* h = d;
+	Dictionary* prev = NULL;
+	while (h->second != NULL){
+		prev = h;
+		h = h->second;
+	}
+	free((h->first)->myKey);
+	free(h->first);
+	free(h);
+	if(prev != NULL){
+		prev->second = NULL;
+		dict_free(d);
+	}else{
+		Pair* to_free = d->first;
+		d->first = NULL;
+		d->second = NULL;
+	}
+
+}
+
 /*
     Takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d),
     the definition that is supposed to be associated with the word (char* def) and the ID (int ID) and it stores
@@ -98,18 +121,27 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
     //create a new pair with the key and def specified
     printf("in dict_add() #2; :%s, %s\n", key, def);
     Pair* pair = newPair(key, def, ID);
-    printf("inside dict_add(), before adding");
+    printf("inside dict_add(), before adding\n");
     
     //handles the empty dictionary case
     if(d->first == NULL){
-        printf("inside main(), case: first obj");
+        printf("inside main(), case: first obj\n");
         d->first = pair;
         return 0;
-    } else { //handles any other case
-        
-        printf("inside main(), case: second obj");
+        }
+    Dictionary* new = d;
+    Dictionary* prev = NULL;
+    //handles any other case
+    while(new != NULL){
+        if (strcmp((new->first)->myKey, key) == 0){
+            (new->first)->myDef = def;
+        }
+        prev = new;
+        new = new->second;
+    }
+    if(d->first != NULL){
         Dictionary* new = dict();
-        Dictionary* prev = NULL;
+        printf("inside main(), case: second obj\n");
         new->first =pair;
         new->second =NULL;
         prev->second = new;
@@ -123,6 +155,7 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
 int dict_add_id(Dictionary* d, char* key, char* def){
     printf("in dict_add_id(); :%s, %s\n", key, def);
     dict_add(d,key,def,createID(key));
+    return 0;
 }
 
 /*
@@ -130,6 +163,7 @@ int dict_add_id(Dictionary* d, char* key, char* def){
 */
 int dict_add_def(Dictionary* d, char* key, int ID){
     dict_add(d,key,STANDARD_DEF,ID);
+    return 0;
 }
 
 /*
@@ -205,6 +239,8 @@ int load(Dictionary* d, char* filename){
         printf("inside load(), key: %s, def: %s\n", key, def);
         printf("inside load(), return of dict_get(): %d\n", tempReturn);
     }
+    //close(fd);
+    free(line);
     return 0;
 }
 /*
@@ -237,10 +273,10 @@ int main(int argc, char *argv[]){
     //load the words from the file "test.txt" into the created dictionary
     char* fileName = "test.txt";
     load(d, fileName);
+    dict_free(d);
     //close(fd);
     return 0;
 }
-
 
 
 
