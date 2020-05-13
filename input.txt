@@ -1,0 +1,6 @@
+hello: world
+hi: there
+this: is just a test
+dog: an animal
+apple: a fruit
+cat: a pet
