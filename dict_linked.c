@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #define DELIM ":\t"
-#define FILENAME  "filename.txt"
+#define FILENAME  "test.txt"
+#define STANDARD_FILE "saved_dict.txt"
 #define STANDARD_DEF "(No definition specified)"
 /*
 public static char* DELIM = ":\t";
