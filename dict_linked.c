@@ -239,7 +239,7 @@ void show_options(){
 
 void ask_for_key(char** key){
   while(1){
-    printf("%s", "Please enter the word you'd like to add: ");
+    printf("%s", "Please enter the word you want to do the operation on: ");
     fgets(*key,100,stdin);
     //printf("%s","\n");
     
@@ -251,7 +251,7 @@ void ask_for_key(char** key){
 
 void ask_for_def(char** def){
   while(1){
-    printf("%s", "Please enter the definition you'd like to add to the word provided: ");
+    printf("%s", "Please enter the definition corresponding with the word provided: ");
     fgets(*def,100,stdin);
     printf("%s","\n");
     
@@ -273,6 +273,12 @@ void ask_for_filename(char** filename){
   }
 }
 
+void remove_newline(char* line){
+    int new_line =strlen(line)-1;
+    if (line[new_line] == '\n'){
+        line[new_line] = NULL;
+    }
+}
 
 
 int user_add(Dictionary* d, char* key, char* def){
@@ -318,7 +324,7 @@ int main(int argc, char *argv[]){
     while(run){
         char* userKeyMal = (char*) malloc(100 * sizeof(char));
         char* userDefMal = (char*) malloc(100 * sizeof(char));
-        char* userFilenameMal = (char*) malloc(100 * sizeof(char));
+        char* userFileNameMal = (char*) malloc(100 * sizeof(char));
 
         show_options();
         fgets(userChoice,100,stdin);
@@ -331,9 +337,12 @@ int main(int argc, char *argv[]){
         } else if(0 == strcmp(userChoice, "1\n")){ //user wants to add a single word
 
             ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
             strcpy(userKey, userKeyMal);
             
+
             ask_for_def(& userDefMal);
+            remove_newline(userDefMal);
             strcpy(userDef, userDefMal);
 
             if(0 > user_add(d,userKeyMal, userDef)){
@@ -343,6 +352,7 @@ int main(int argc, char *argv[]){
         }else if(0 == strcmp(userChoice, "2\n")){ //user wants to remove a word
 
             ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
             strcpy(userKey, userKeyMal);
 
             if(0 > user_remove(d, userKeyMal)){
@@ -352,7 +362,8 @@ int main(int argc, char *argv[]){
         } else if(0 == strcmp(userChoice, "3\n")){ //user wants to load words from file
 
             ask_for_filename(& userFileNameMal); 
-            strcpy(userFilename, userFilenameMal);
+            remove_newline(userFileNameMal);
+            strcpy(userFileName, userFileNameMal);
 
             if(0 > user_load(d, userFileName)){
                 printf("%s","ERROR: there was a problem with adding your file, please try again.\n");
@@ -365,9 +376,11 @@ int main(int argc, char *argv[]){
         } else if(0 == strcmp(userChoice, "5\n")){ //user wants to change the definition of the word
 
             ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
             strcpy(userKey, userKeyMal);
 
             ask_for_def(& userDefMal);
+            remove_newline(userDefMal);
             strcpy(userDef, userDefMal);
 
             if(0 > user_change_def(d, userKey,userDef)){
@@ -377,6 +390,7 @@ int main(int argc, char *argv[]){
         }else if(0 == strcmp(userChoice, "6\n")){ //user is looking for a particular word
 
             ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
             strcpy(userKey, userKeyMal);
 
             if(0 > user_search(d, userKey,& userDef)){
@@ -390,7 +404,7 @@ int main(int argc, char *argv[]){
         }
         free(userKeyMal);
         free(userDefMal);
-        free(userFilenameMal);
+        free(userFileNameMal);
     }
     
     //----------------------------TESTS-----------------------------------
