@@ -194,7 +194,7 @@ int load(Dictionary* d, char* filename){
         }
         
         //...and then add them into the dictionary.
-        int tempReturn = dict_add_id(d, key, def);
+        int tempReturn = dict_add(d, key, def);
         if( tempReturn < 0){
             printf("ERROR in load(), in dict_add()");
         }
