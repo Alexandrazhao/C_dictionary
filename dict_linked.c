@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #define DELIM ":\t"
-#define FILENAME  "test.txt"
-#define STANDARD_FILE "saved_dict.txt"
+#define FILENAME  "filename.txt"
 #define STANDARD_DEF "(No definition specified)"
 /*
 public static char* DELIM = ":\t";
@@ -23,26 +22,26 @@ typedef struct Dictionary{
     struct Dictionary* second; //pointer to a dictionary
 }Dictionary;
 
+struct Pair* hashArray[SIZE];
+struct Pair* p; 
 
 Pair* newPair(char* key, char* def, int ID) { 
-    printf("in newPair() before malloc; :%s, %s\n", key, def);
+    //printf("in newPair() before malloc; :%s, %s\n", key, def);
     //size_t size_to_allocate = A_MEGABYTE;
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
     p->myKey = (char*)malloc(sizeof(key));
     p->myDef = (char*)malloc(sizeof(def));
-    
-    printf("in newPair(), before, p->myKey: %s, key: %s \n", p->myKey, key);
-    printf("in newPair(), before, p->myDef: %s, def: %s \n", p->myDef, def);
-    
+    //p->myID = (char*)malloc(sizeof(ID));
+    //printf("in newPair(), before, key: %s \n",  key);
+    //printf("in newPair(), before, def: %s \n", def);
+    //printf("in newPair(), before, ID: %d \n", ID);
     strncat(p->myKey, key, strlen(key));
     strncat(p->myDef, def, strlen(def));
     p->myKey = key;
     //free(def);
     p->myDef = def;
-    printf("in newPair(), after, p->myKey: %s, key: %s \n", p->myKey, key);
-    printf("in newPair(), after, p->myDef: %s, def: %s \n", p->myDef, def);
+    p->myID = ID;
     return p; 
-    
 } 
 
 
@@ -54,31 +53,16 @@ Dictionary* dict(){
 }
 
 int createID(char* key){
-    /*
-    //create a var to keep track if a key is already existed in the dictionary
-    int in_dict = 0;
-    //loop through the dictionary
-    Dictionary* tmp = d;
-    Dictionary* prev = NULL;
-    while (tmp != NULL && in_dict==0){
-        if(strcmp((tmp->first)->key, key) == 0){
-            in_dict = 1;
-            (tmp->first)->value = val;
-        }
-        prev = tmp;
-        tmp = tmp->second;
-    }
-    */
-    return 20;
+    
+    int key_len = strlen(key);
+    return key_len % SIZE;
 }
-
 /*
     Takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d),
     the definition that is supposed to be associated with the word (char* def) and it stores
     that as a new Pair "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
 */
 int dict_add(Dictionary* d, char* key, char* def){
-    printf("in dict_add(); :%s, %s\n", key, def);
     
     //makes sure the key is not null
     if(key == NULL){
@@ -90,36 +74,55 @@ int dict_add(Dictionary* d, char* key, char* def){
     if(def == NULL){
         return dict_add(d,key,STANDARD_DEF);
     }
+
+    int ID = createID(key);
     
     //create a new pair with the key and def specified
-    printf("in dict_add() #2; :%s, %s\n", key, def);
     Pair* pair = newPair(key, def, ID);
-    printf("inside dict_add(), before adding\n");
     
     //handles the empty dictionary case
+    Dictionary* pointer = d;
+    Dictionary* prev = NULL;
     if(d->first == NULL){
-        printf("inside main(), case: first obj\n");
-        d->first = pair;
+        Dictionary* new = dict();
+        new->first =pair;
+        new->second =d;
+        d = new;
+        printf("inside dict_add(),  #1 my myKey:  %s\n", (new->first)->myKey);
+        printf("inside dict_add(), #1 my myId:  %d\n", (new->first)->myID);
+        printf("inside dict_add(), #1 my myDef: %s\n", (new->first)->myDef);
         return 0;
         }
-    Dictionary* new = d;
-    Dictionary* prev = NULL;
     //handles any other case
-    while(new != NULL){
-        if (strcmp((new->first)->myKey, key) == 0){
-            (new->first)->myDef = def;
-        }
-        prev = new;
-        new = new->second;
+    while(pointer->first != NULL){
+        prev = pointer;
+        pointer = pointer->second;
+        
     }
     if(d->first != NULL){
-        Dictionary* new = dict();
-        printf("inside main(), case: second obj\n");
-        new->first =pair;
-        new->second =NULL;
-        prev->second = new;
+        Dictionary* new2 = dict();
+        new2->first =pair;
+        new2->second =pointer;
+        prev->second = new2;
+        printf("inside dict_add(), my myKey:  %s\n", (new2->first)->myKey);
+        printf("inside dict_add(), my myId:  %d\n", (new2->first)->myID);
+        printf("inside dict_add(), my myDef: %s\n", (new2->first)->myDef);
         return 0;
     }
+    
+}
+
+void display_dict(Dictionary* d){
+    //int in_dict = 0;
+    Dictionary* pointer = d;
+    Dictionary* prev = NULL;
+    //handles any other case
+     while(pointer->first != NULL){
+        prev = pointer;
+        pointer = pointer->second;
+        printf("I am in display_dict, my Key is: %s\n", (pointer->first)->myKey);
+    }
+   
 }
 
 /*
@@ -130,24 +133,43 @@ int dict_add_def(Dictionary* d, char* key){
     return 0;
 }
 
-/*
-    Searches for a word with the key (char* key) in the dictionary (Dictionary* d). Returns
-*/
-int dict_search(Dictionary* d, char* key){
-    printf("inside dict_search(), key:%s", key);
-    if(d-> first == NULL){
+int dict_add_id(Dictionary* d, char* key, char* def){
+    //printf("in dict_add_id(); :%s, %s\n", key, def);
+    dict_add(d,key,def);
+    return 0;
+}
+
+int dict_search(Dictionary* new, char* key){
+    //printf("inside dict_search(), key:%s", key);
+    //get the hash
+    //int ID = createID(key);
+    //dict_add(new, key, STANDARD_DEF);
+    int ID = createID(key); //create the ID of the input word
+    //dict_add_def(new,key); //call the dict_add to generate the struct of key and ID;
+    if(new->first == NULL){
         return -1;
     }
-    printf("inside dict_get(), after if statement");
+    printf("inside dict_search the ID I generated: %d \n", ID);
+    printf("in dict_search(), I found the first item in my key is %s\n", (new->first)->myDef);
+    //printf("inside dict_get(), after if statement");
+    /*
     Dictionary* tmp = d;
     while(tmp != NULL){
-        if(strcmp((tmp->first)->myKey, key) == 0){
-            return (tmp->first)->myDef;
+        if((tmp->first)->myID == ID){
+            return (tmp->first)->myKey;
         }
         tmp = tmp->second;
     }
     return -1;
+    */
+
+   
+   return 2;
 }
+
+/*
+    Searches for a word with the key (char* key) in the dictionary (Dictionary* d). Returns
+*/
 
 /*
     Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
@@ -186,24 +208,26 @@ int load(Dictionary* d, char* filename){
         
         //... tokenize it based on the DELIM dividers...
         char* key = strtok(line, DELIM);
-        printf("STRTOK TEST: key= %s\n",key);
+        //printf("STRTOK TEST: key= %s\n",key);
         char* def = strtok(NULL, DELIM);
-        printf("%s", def);
+        //printf("%s", def);
     
         if(def == NULL){
             def = STANDARD_DEF;
         }
         
         //...and then add them into the dictionary.
-        int tempReturn = dict_add(d, key, def);
-        if( tempReturn < 0){
+        
+        int tempReturn = dict_add_id(d, key, def);
+        if( tempReturn < -1){
             printf("ERROR in load(), in dict_add()");
         }
         
-        printf("inside load(), key: %s, def: %s\n", key, def);
-        printf("inside load(), return of dict_get(): %d\n", tempReturn);
+        //printf("inside load(), key: %s, def: %s\n", key, def);
+        //printf("inside load(), return of dict_get(): %d\n", tempReturn);
     }
-    //close(fd);
+    //fprintf(fd, dict_insert(d, "apple", "a fruit", 9));
+    fclose(fd);
     free(line);
     return 0;
 }
