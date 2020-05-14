@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #define DELIM ":\t"
-#define FILENAME  "database.txt"
+#define FILENAME  "filename.txt"
 #define STANDARD_DEF "(No definition specified)"
 /*
 public static char* DELIM = ":\t";
