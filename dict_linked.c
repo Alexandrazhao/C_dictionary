@@ -73,10 +73,10 @@ int createID(char* key){
 
 /*
     Takes in an instance of the dictionary (Dictionary* d), the new word that is going to be added (char* d),
-    the definition that is supposed to be associated with the word (char* def) and the ID (int ID) and it stores
+    the definition that is supposed to be associated with the word (char* def) and it stores
     that as a new Pair "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
 */
-int dict_add(Dictionary* d, char* key, char* def, int ID){
+int dict_add(Dictionary* d, char* key, char* def){
     printf("in dict_add(); :%s, %s\n", key, def);
     
     //makes sure the key is not null
@@ -85,14 +85,9 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
         return -1;
     }
     
-    //if the ID is NULL, give a proper ID
-    if(ID == NULL){
-        return dict_add_id(d,key,def);
-    }
-    
     //if the definition specified is NULL, sets it to STANDARD_DEF
     if(def == NULL){
-        return dict_add_id(d,key,STANDARD_DEF);
+        return dict_add(d,key,STANDARD_DEF);
     }
     
     //create a new pair with the key and def specified
@@ -127,19 +122,10 @@ int dict_add(Dictionary* d, char* key, char* def, int ID){
 }
 
 /*
-   like regular dict_add(), but creates a new ID for the word
-*/
-int dict_add_id(Dictionary* d, char* key, char* def){
-    printf("in dict_add_id(); :%s, %s\n", key, def);
-    dict_add(d,key,def,createID(key));
-    return 0;
-}
-
-/*
    like regular dict_add(), but sets the definition to STANDARD_DEF
 */
-int dict_add_def(Dictionary* d, char* key, int ID){
-    dict_add(d,key,STANDARD_DEF,ID);
+int dict_add_def(Dictionary* d, char* key){
+    dict_add(d,key,STANDARD_DEF);
     return 0;
 }
 
