@@ -108,6 +108,24 @@ void dict_remove(Dictionary* d, char* key){
     }
 }
 
+/* 
+Creates an int hash code based on the key provided that's based on the ASCII code of up to 3
+    letters of the word, with the empty spaces being filled by 0's
+*/
+int createID(char* key){
+    int tempId;
+    char character;
+    
+    for(int i = 0; i<3; i++){
+        character = key[i];
+        if(i > 0){
+            tempId = tempId * 1000;
+        }
+        tempId += (int)character;
+    }
+    return tempId;
+}
+
 // Method for adding new pairs into the dictionary
 void dict_add(Dictionary* d, char* key, char* def){
     int ID = 10;
