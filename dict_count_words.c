@@ -1,5 +1,6 @@
 
 
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@
 // Struct for a pair holding a key and a value
 typedef struct Pair{
 	char* myKey;
+    char* myDef;
 	int myID;
 }Pair;
 
@@ -110,7 +112,25 @@ void dict_add(Dictionary* d, char* key, int ID){
 		prev->second = new;
 	}
 }
+void display_dict(Dictionary* d){
+    Dictionary* h = d;
+    if(h->first== NULL){
+        printf("{}\n");
+        return;
+    }
+    printf("{");
+	while (h != NULL){
+		Pair* x = h->first;
+		printf("%s=%d", x->myKey, x->myID);
+		if (h->second != NULL){
+			printf(", ");
+		}		
+		h = (h->second);
 
+	}
+	printf("}");
+	printf("\n");
+}
 
 // Method for freeing all malloced memory from the dictionary.
 // At the end makes the dictionary empty.
@@ -195,10 +215,16 @@ int main(int argc, char *argv[]) {
 	Dictionary* d = dict();
     char* fileName = "test.txt";
 	load(d, fileName);
-	
+	display_dict(d);
 	dict_free(d);
 	return 0;
 }
+
+
+
+
+
+
 
 
 
