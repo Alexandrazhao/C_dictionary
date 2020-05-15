@@ -1,1 +1,5 @@
-pear a fruit apple a red round fruit yes  a sure thing cherry: red fruit candlele a fire thing hello world This is warm
+pear: a fruit 
+apple: a red round fruit 
+yes: a sure thing 
+cherry: red fruit 
+candlele: a fire thing hello world This is warm
