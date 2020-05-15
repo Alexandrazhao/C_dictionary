@@ -113,7 +113,7 @@ Creates an int hash code based on the key provided that's based on the ASCII cod
     letters of the word, with the empty spaces being filled by 0's
 */
 int createID(char* key){
-    int tempId;
+    int tempId = 0;
     char character;
     
     for(int i = 0; i<3; i++){
@@ -128,11 +128,11 @@ int createID(char* key){
 
 // Method for adding new pairs into the dictionary
 void dict_add(Dictionary* d, char* key, char* def){
-    int ID = 10;
 	if (key == NULL || def == 0){
 		printf("You cannot use null keyes and values\n");
 		return;
 	}
+    int ID = createID(key);
     
 	// create a pair out of key and value
 	Pair* pair = newPair(key, def, ID);
@@ -272,10 +272,10 @@ int loadText(Dictionary* d, char* filename){
 //-----------------------------------------USER INTERFACE------------------------------------------
 
 void show_options(){
-  printf("%s","Please select an option by typing in a number corresponding with the option desired:\n");
-  printf("%s","      (1) Add a new word\n      (2) Remove a word\n     (3) Add words from file\n");
-  printf("%s","      (4) Display all words\n     (5) Change a definition of a word\n   (6) search for a word\n");
-  printf("%s\n", "   (7) Exit and save.");
+  printf("%s","\nPlease select an option by typing in a number corresponding with the option desired:\n");
+  printf("%s","      (1) Add a new word\n      (2) Remove a word\n      (3) Add words from file\n");
+  printf("%s","      (4) Display all words\n      (5) Change a definition of a word\n      (6) search for a word\n");
+  printf("%s\n", "      (7) Exit and save.");
 }
 
 
@@ -284,7 +284,6 @@ void ask_for_key(char** key){
   while(1){
     printf("%s", "Please enter the word you want to do the operation on: ");
     fgets(*key,100,stdin);
-    //printf("%s","\n");
     
     if(*key==NULL){
       printf("ERROR: input cannot be null. Try again\n");
@@ -296,7 +295,6 @@ void ask_for_def(char** def){
   while(1){
     printf("%s", "Please enter the definition corresponding with the word provided: ");
     fgets(*def,100,stdin);
-    printf("%s","\n");
     
     if(*def==NULL){
       printf("ERROR: input cannot be null. Try again\n");
@@ -308,7 +306,6 @@ void ask_for_filename(char** filename){
     while(1){
     printf("%s", "Please enter the file name you'd like to access: ");
     fgets(*filename,100,stdin);
-    printf("%s","\n");
     
     if(*filename==NULL){
       printf("ERROR: input cannot be null. Try again\n");
@@ -329,9 +326,8 @@ int user_add(Dictionary* d, char* key, char* def){
     return 1;
 }
 
-int user_remove(Dictionary* d, char* key){
+void user_remove(Dictionary* d, char* key){
     dict_remove(d, key);
-    return -1;//dict_remove(d, key);
 }
 
 int user_load(Dictionary* d, char* filename){
@@ -400,9 +396,7 @@ int main(int argc, char *argv[]){
             remove_newline(userKeyMal);
             strcpy(userKey, userKeyMal);
 
-            if(0 > user_remove(d, userKeyMal)){
-                printf("%s","ERROR: there was a problem with removing your word, please try again.\n");
-            }
+            user_remove(d, userKeyMal);
 
         } else if(0 == strcmp(userChoice, "3\n")){ //user wants to load words from file
 
