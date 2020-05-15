@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -73,9 +70,10 @@ int dict_get(Dictionary* d, char* key){
 	return -1; 
 }
 
+
 // Method for adding new pairs into the dictionary
 void dict_add(Dictionary* d, char* key, int ID){
-	if (ID == -1){
+    if (ID == -1){
 		printf("-1 value reserved, please use another one\n");
 		return;
 	}
@@ -83,6 +81,7 @@ void dict_add(Dictionary* d, char* key, int ID){
 		printf("You cannot use null keyes and values\n");
 		return;
 	}
+    
 	// create a pair out of key and value
 	Pair* pair = newPair(key, ID);
 	// case when dictionary is empty
@@ -155,7 +154,15 @@ void dict_free(Dictionary* d){
 	}
 }
 
-int load(Dictionary* d, char* filename){
+/*
+    Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
+    be accessed (char* filename) and stores all of the words present in the file in the dictionary, and sets
+    all definitions equal to STANDARD_DEF. Returns 0 upon success and -1 when an error has arised. 
+    Does not require a specific format.
+    
+    USAGE: processing large text files with no "dictionary format"
+*/
+int loadText(Dictionary* d, char* filename){
     
     //open the given file and set up access
     FILE *fd = fopen(filename, "r");
@@ -209,32 +216,196 @@ int load(Dictionary* d, char* filename){
 	printf("Size of c dictionary (Linked List): %d\n", dict_size(d));
     return 0;
 }
+//-----------------------------------------USER INTERFACE------------------------------------------
 
-int main(int argc, char *argv[]) {
-
-	Dictionary* d = dict();
-    char* fileName = "test.txt";
-	load(d, fileName);
-	display_dict(d);
-	dict_free(d);
-	return 0;
+void show_options(){
+  printf("%s","Please select an option by typing in a number corresponding with the option desired:\n");
+  printf("%s","      (1) Add a new word\n      (2) Remove a word\n     (3) Add words from file\n");
+  printf("%s","      (4) Display all words\n     (5) Change a definition of a word\n   (6) search for a word\n");
+  printf("%s\n", "   (7) Exit and save.");
 }
 
 
 
+void ask_for_key(char** key){
+  while(1){
+    printf("%s", "Please enter the word you want to do the operation on: ");
+    fgets(*key,100,stdin);
+    //printf("%s","\n");
+    
+    if(*key==NULL){
+      printf("ERROR: input cannot be null. Try again\n");
+    }else {return;}
+  }
+}
+
+void ask_for_def(char** def){
+  while(1){
+    printf("%s", "Please enter the definition corresponding with the word provided: ");
+    fgets(*def,100,stdin);
+    printf("%s","\n");
+    
+    if(*def==NULL){
+      printf("ERROR: input cannot be null. Try again\n");
+    }else {return;}
+  }
+}
+
+void ask_for_filename(char** filename){
+    while(1){
+    printf("%s", "Please enter the file name you'd like to access: ");
+    fgets(*filename,100,stdin);
+    printf("%s","\n");
+    
+    if(*filename==NULL){
+      printf("ERROR: input cannot be null. Try again\n");
+    }else {return;}
+  }
+}
+
+void remove_newline(char* line){
+    int new_line =strlen(line)-1;
+    if (line[new_line] == '\n'){
+        line[new_line] = NULL;
+    }
+}
 
 
+int user_add(Dictionary* d, char* key, char* def){
+    dict_add(d,key,10);
+    return 1;
+}
 
+int user_remove(Dictionary* d, char* key){
+    return -1;//dict_remove(d, key);
+}
 
+int user_load(Dictionary* d, char* filename){
+    return loadText(d,filename);
+}
 
+void user_display(Dictionary* d){
+    display_dict(d);
+}
 
+int user_change_def(Dictionary* d, char* key, char* def){
+    return -1;
+}
 
+char* user_search(Dictionary*d, char* key, char** def){
+    return &def;
+}
 
+int main(int argc, char *argv[]){
+    //----------------------------VARIABLES-----------------------------
+    
+    char userChoice[100];
+    char* userKey[100];
+    char* userDef[100];
+    char* userFileName[100];
+    int run = 1;
 
+    //create an "instance" of the dictionary
+    Dictionary* d = dict();
+    
+    //load all the words from a previous instance of the program
+    //load_std(d);
 
+    //-----------------------Main Loop----------------------
+    while(run){
+        char* userKeyMal = (char*) malloc(100 * sizeof(char));
+        char* userDefMal = (char*) malloc(100 * sizeof(char));
+        char* userFileNameMal = (char*) malloc(100 * sizeof(char));
 
+        show_options();
+        fgets(userChoice,100,stdin);
 
+        printf("User choice: %s", userChoice);
+    
+        if(userChoice==NULL){
+          printf("ERROR: input cannot be null");
+          break;
+        } else if(0 == strcmp(userChoice, "1\n")){ //user wants to add a single word
 
+            ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
+            strcpy(userKey, userKeyMal);
+            
 
+            ask_for_def(& userDefMal);
+            remove_newline(userDefMal);
+            strcpy(userDef, userDefMal);
+
+            if(0 > user_add(d,userKeyMal, userDef)){
+                printf("%s","ERROR: there was a problem with adding your word, please try again.\n");
+            }
+
+        }else if(0 == strcmp(userChoice, "2\n")){ //user wants to remove a word
+
+            ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
+            strcpy(userKey, userKeyMal);
+
+            if(0 > user_remove(d, userKeyMal)){
+                printf("%s","ERROR: there was a problem with removing your word, please try again.\n");
+            }
+
+        } else if(0 == strcmp(userChoice, "3\n")){ //user wants to load words from file
+
+            ask_for_filename(& userFileNameMal); 
+            remove_newline(userFileNameMal);
+            strcpy(userFileName, userFileNameMal);
+            printf("USER FILE NAME: '%s'\n", userFileName);
+
+            if(0 > user_load(d, userFileName)){
+                printf("%s","ERROR: there was a problem with adding your file, please try again.\n");
+            }
+
+        } else if(0 == strcmp(userChoice, "4\n")){ //user wants to see all words
+
+            user_display(d);
+
+        } else if(0 == strcmp(userChoice, "5\n")){ //user wants to change the definition of the word
+
+            ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
+            strcpy(userKey, userKeyMal);
+
+            ask_for_def(& userDefMal);
+            remove_newline(userDefMal);
+            strcpy(userDef, userDefMal);
+
+            if(0 > user_change_def(d, userKey,userDef)){
+                printf("%s","ERROR: there was a problem with changing your definition, please try again.\n");
+            }
+
+        }else if(0 == strcmp(userChoice, "6\n")){ //user is looking for a particular word
+
+            ask_for_key(& userKeyMal);
+            remove_newline(userKeyMal);
+            strcpy(userKey, userKeyMal);
+
+            if(0 > user_search(d, userKey,& userDef)){
+                printf("%s","ERROR: there was a problem with finding your word, please try again.\n");
+            }
+
+        }else if(0 == strcmp(userChoice, "7\n")){
+            run = 0;
+        }else{
+            printf("ERROR: choice not recognized. Please try again");
+        }
+        free(userKeyMal);
+        free(userDefMal);
+        free(userFileNameMal);
+    }
+    
+    //----------------------------TESTS-----------------------------------
+    
+    //load the words from the file "test.txt" into the created dictionary
+    //load(d, userFileName);
+    //dict_free(d);
+    //close(fd);
+    return 0;
+}
 
 
