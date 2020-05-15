@@ -4,6 +4,7 @@
 #define DELIM ":\t"
 #define FILENAME  "filename.txt"
 #define STANDARD_DEF "(No definition specified)"
+#define SIZE 100
 /*
 public static char* DELIM = ":\t";
 public static char* FILENAME = "test.txt"; //change it to the file that is gonna be used for storing our info bw instances of the process
@@ -26,30 +27,28 @@ struct Pair* hashArray[SIZE];
 struct Pair* p; 
 
 Pair* newPair(char* key, char* def, int ID) { 
-    //printf("in newPair() before malloc; :%s, %s\n", key, def);
-    //size_t size_to_allocate = A_MEGABYTE;
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
     p->myKey = (char*)malloc(sizeof(key));
     p->myDef = (char*)malloc(sizeof(def));
-    //p->myID = (char*)malloc(sizeof(ID));
-    //printf("in newPair(), before, key: %s \n",  key);
-    //printf("in newPair(), before, def: %s \n", def);
-    //printf("in newPair(), before, ID: %d \n", ID);
+    
     strncat(p->myKey, key, strlen(key));
     strncat(p->myDef, def, strlen(def));
     p->myKey = key;
-    //free(def);
+    
     p->myDef = def;
     p->myID = ID;
     return p; 
 } 
 
+Dictionary* dict_next(Pair* pair, Dictionary* pointer){
+    Dictionary* new = (Dictionary*)malloc(sizeof(Dictionary));
+    new->first = pair;
+    new->second = pointer; 
+    return new; 
+}
 
 Dictionary* dict(){
-    Dictionary* d = (Dictionary*)malloc(sizeof(Dictionary));
-    d->first = NULL;
-    d->second = NULL; 
-    return d; 
+    return dict_next(NULL,NULL);
 }
 
 int createID(char* key){
@@ -62,7 +61,7 @@ int createID(char* key){
     the definition that is supposed to be associated with the word (char* def) and it stores
     that as a new Pair "object" in the dictionary. Returns 0 when successful, and -1 when an error has arised.
 */
-int dict_add(Dictionary* d, char* key, char* def){
+int dict_add(Dictionary** d, char* key, char* def){
     
     //makes sure the key is not null
     if(key == NULL){
@@ -81,32 +80,31 @@ int dict_add(Dictionary* d, char* key, char* def){
     Pair* pair = newPair(key, def, ID);
     
     //handles the empty dictionary case
-    Dictionary* pointer = d;
+    Dictionary* pointer = *d;
     Dictionary* prev = NULL;
-    if(d->first == NULL){
-        Dictionary* new = dict();
-        new->first =pair;
-        new->second =d;
-        d = new;
-        printf("inside dict_add(),  #1 my myKey:  %s\n", (new->first)->myKey);
-        printf("inside dict_add(), #1 my myId:  %d\n", (new->first)->myID);
-        printf("inside dict_add(), #1 my myDef: %s\n", (new->first)->myDef);
+
+    printf("I AM GOING CRAZY %d\n", pointer->first);
+    if(pointer->first == NULL){
+        printf("In dict_add(), when the dictionary is empty\n");
+        Dictionary* new = dict_next(pair, d);
+        *d = new;
+        printf("|      d      |    |               |\n");
+        printf("|  %s  |  %s  | -> |  %s   | NULL  |\n", new->first->myKey, "d", new->second);
+        printf("%s\n",new->first);
         return 0;
         }
     //handles any other case
+    printf("I AM IN HERE OIDFGDRBGJDFBG\n");
+    
     while(pointer->first != NULL){
+        printf("While loop %s\n", pointer->first-);
         prev = pointer;
         pointer = pointer->second;
-        
     }
-    if(d->first != NULL){
-        Dictionary* new2 = dict();
-        new2->first =pair;
-        new2->second =pointer;
+    
+    if(pointer->first != NULL){
+        Dictionary* new2 = dict_next(pair, pointer);
         prev->second = new2;
-        printf("inside dict_add(), my myKey:  %s\n", (new2->first)->myKey);
-        printf("inside dict_add(), my myId:  %d\n", (new2->first)->myID);
-        printf("inside dict_add(), my myDef: %s\n", (new2->first)->myDef);
         return 0;
     }
     
@@ -130,12 +128,6 @@ void display_dict(Dictionary* d){
 */
 int dict_add_def(Dictionary* d, char* key){
     dict_add(d,key,STANDARD_DEF);
-    return 0;
-}
-
-int dict_add_id(Dictionary* d, char* key, char* def){
-    //printf("in dict_add_id(); :%s, %s\n", key, def);
-    dict_add(d,key,def);
     return 0;
 }
 
@@ -218,7 +210,7 @@ int load(Dictionary* d, char* filename){
         
         //...and then add them into the dictionary.
         
-        int tempReturn = dict_add_id(d, key, def);
+        int tempReturn = dict_add(d, key, def);
         if( tempReturn < -1){
             printf("ERROR in load(), in dict_add()");
         }
@@ -306,7 +298,7 @@ void remove_newline(char* line){
 }
 
 
-int user_add(Dictionary* d, char* key, char* def){
+int user_add(Dictionary** d, char* key, char* def){
     return dict_add(d,key,def);
 }
 
@@ -370,7 +362,7 @@ int main(int argc, char *argv[]){
             remove_newline(userDefMal);
             strcpy(userDef, userDefMal);
 
-            if(0 > user_add(d,userKeyMal, userDef)){
+            if(0 > user_add(& d,userKeyMal, userDef)){
                 printf("%s","ERROR: there was a problem with adding your word, please try again.\n");
             }
 
