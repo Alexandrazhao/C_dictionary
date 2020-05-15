@@ -12,7 +12,7 @@
 // Struct for a pair holding a key and a value
 typedef struct Pair{
 	char* myKey;
-    char* myDef;
+    	char* myDef;
 	int myID;
 }Pair;
 
@@ -23,10 +23,12 @@ typedef struct Dictionary{
 }Dictionary;
 
 // "Constructor" for a key-value pair - returns a pointer to a pair.
-Pair* newPair(char* key, int ID) { 
+Pair* newPair(char* key, char* def, int ID) { 
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
     p->myKey = (char*)malloc(sizeof(key));
+    p->myDef = (char*)malloc(sizeof(def));
     strncat(p->myKey, key, strlen(key));
+    strncat(p->myDef, def, strlen(def));
     p->myID = ID; 
     return p; 
 } 
@@ -72,18 +74,15 @@ int dict_get(Dictionary* d, char* key){
 
 
 // Method for adding new pairs into the dictionary
-void dict_add(Dictionary* d, char* key, int ID){
-    if (ID == -1){
-		printf("-1 value reserved, please use another one\n");
-		return;
-	}
-	if (key == NULL || ID == 0){
+void dict_add(Dictionary* d, char* key, char* def){
+    int ID = 10;
+	if (key == NULL || def == 0){
 		printf("You cannot use null keyes and values\n");
 		return;
 	}
     
 	// create a pair out of key and value
-	Pair* pair = newPair(key, ID);
+	Pair* pair = newPair(key, def, ID);
 	// case when dictionary is empty
 	if (d->first == NULL){
 		d->first = pair;
@@ -98,6 +97,7 @@ void dict_add(Dictionary* d, char* key, int ID){
 		// if key exists in dictionary, change in_dict to 1 and update the value of the key with new value
 		if (strcmp((tmp->first)->myKey, key) == 0){
 			in_dict = 1;
+            (tmp->first)->myDef = def;
 			(tmp->first)->myID = ID;
 		}
 		prev = tmp;
@@ -272,7 +272,7 @@ void remove_newline(char* line){
 
 
 int user_add(Dictionary* d, char* key, char* def){
-    dict_add(d,key,10);
+    dict_add(d,key,def);
     return 1;
 }
 
