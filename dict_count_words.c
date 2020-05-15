@@ -12,7 +12,7 @@
 // Struct for a pair holding a key and a value
 typedef struct Pair{
 	char* myKey;
-    	char* myDef;
+    char* myDef;
 	int myID;
 }Pair;
 
@@ -71,7 +71,42 @@ int dict_get(Dictionary* d, char* key){
 	}
 	return -1; 
 }
-
+void dict_remove(Dictionary* d, char* key){
+    int delete = 0; //a counter for how many words i delete
+    Dictionary* temp = d;
+    Dictionary* prev = NULL;
+    while(temp != NULL && delete == 0){
+        if(strcmp((temp->first)->myKey,key) == 0){
+            Pair* remove = temp->first;
+            if(prev != NULL){
+                prev->second = temp->second;
+                free(remove->myKey);
+                free(remove);
+                free(temp);
+            }
+        //if key is the first item in dictionary
+            else{
+                //if the dict has more than one item
+                if(temp->second !=NULL){
+                    temp->first = (temp->second)->first;
+                    temp->second = (temp->second)->second;
+                    free(remove->myKey);
+                    free(remove);
+                }
+                else{//when dict has only one item
+                    free(remove->myKey);
+                    free(remove);
+                    temp->first = NULL;
+                }
+            }
+            delete = 1;
+        }
+        else{
+            prev = temp;
+            temp = temp->second;
+        }
+    }
+}
 
 // Method for adding new pairs into the dictionary
 void dict_add(Dictionary* d, char* key, char* def){
@@ -277,6 +312,7 @@ int user_add(Dictionary* d, char* key, char* def){
 }
 
 int user_remove(Dictionary* d, char* key){
+    dict_remove(d, key);
     return -1;//dict_remove(d, key);
 }
 
@@ -407,5 +443,3 @@ int main(int argc, char *argv[]){
     //close(fd);
     return 0;
 }
-
-
