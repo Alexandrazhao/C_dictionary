@@ -23,10 +23,10 @@ public class DictionaryFull{
 		while (splitted.hasNext() /*&& n < 10018*/){
 			dictionary.put(splitted.next(), splitted.next());
 			//System.out.println("n=" + n);
-			System.out.println("hasNext()=" + splitted.hasNext());
+			//System.out.println("hasNext()=" + splitted.hasNext());
 			n = n + 1;
 		} 
-		System.out.println(Arrays.asList(dictionary));
+		//System.out.println(Arrays.asList(dictionary));
 		System.out.println("n= " + n);
 		input.close();
 		long endTime = System.nanoTime();
@@ -34,3 +34,4 @@ public class DictionaryFull{
 		System.out.println("Execution time in miliseconds: " + (timeElapsed/1000000));
 	}
 }
+
