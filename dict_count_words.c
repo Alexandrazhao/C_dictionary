@@ -1,11 +1,12 @@
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
 #define DELIM ":\t"
 #define FILENAME  "filename.txt"
+#define STD_FILENAME "test.txt"
 #define STANDARD_DEF "(No definition specified)"
+#define MAX_DEF_LEN 100
+#define MAX_KEY_LEN 10
 #define SIZE 100
 
 
@@ -126,7 +127,9 @@ int createID(char* key){
     return tempId;
 }
 
-// Method for adding new pairs into the dictionary
+/*
+    Method for adding new pairs into the dictionary
+*/
 void dict_add(Dictionary* d, char* key, char* def){
 	if (key == NULL || def == 0){
 		printf("You cannot use null keyes and values\n");
@@ -164,6 +167,9 @@ void dict_add(Dictionary* d, char* key, char* def){
 		prev->second = new;
 	}
 }
+/*
+    Displays all the words in the dictionary d in a specific format.
+*/
 void display_dict(Dictionary* d){
     Dictionary* h = d;
     if(h->first== NULL){
@@ -207,6 +213,47 @@ void dict_free(Dictionary* d){
 	}
 }
 
+/* 
+    Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
+    be accessed (char* filename) and stores all of the words present in the file in the dictionary. Returns
+    0 upon success and -1 when an error has arised. Requires a specific format.
+    
+    USAGE: should be used to process a large file containing words and definitions in the following format:
+    key: definition\n
+*/
+int dict_load(Dictionary* d, char* filename){
+    
+    //open the given file and set up access
+    FILE *fd = fopen(filename, "r");
+    if(fd == NULL){
+        printf("ERROR: No save file found.\n");
+        return -1;
+    }
+    char *line = NULL;
+    ssize_t read;
+    size_t len = 0;
+    
+    //loop over every line in the file...
+    while((read = getline(&line, &len, fd))!= -1){
+        
+        //... tokenize it based on the DELIM dividers...
+        char* key = strtok(line, DELIM);
+        //printf("STRTOK TEST: key= %s\n",key);
+        char* def = strtok(NULL, DELIM);
+        //printf("%s", def);
+    
+        if(def == NULL){
+            def = STANDARD_DEF;
+        }
+        
+        //...and then add them into the dictionary.
+        dict_add(d, key, def);
+    }
+    fclose(fd);
+    free(line);
+    return 0;
+}
+
 /*
     Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
     be accessed (char* filename) and stores all of the words present in the file in the dictionary, and sets
@@ -215,7 +262,7 @@ void dict_free(Dictionary* d){
     
     USAGE: processing large text files with no "dictionary format"
 */
-int loadText(Dictionary* d, char* filename){
+int dict_loadText(Dictionary* d, char* filename){
     
     //open the given file and set up access
     FILE *fd = fopen(filename, "r");
@@ -252,7 +299,6 @@ int loadText(Dictionary* d, char* filename){
 		}
         
     }
-    //fprintf(fd, dict_insert(d, "apple", "a fruit", 9));
     fclose(fd);
     free(line);
     printf("Time elasped of put in milliseconds: %lld\n", total_elasped);
@@ -268,6 +314,47 @@ int loadText(Dictionary* d, char* filename){
 	printf("Average time of get per argument in milliseconds %lld\n", (total_elasped)/6);
 	printf("Size of c dictionary (Linked List): %d\n", dict_size(d));
     return 0;
+}
+
+void dict_save(Dictionary* d, char* filename){
+
+    //open the given file and set up access
+    FILE *fd = fopen(filename, "a");
+    if(fd == NULL){
+        printf("ERROR: No save file found.\n");
+        return;
+    }
+    char *line = (char*)malloc(1000*sizeof(char));
+    ssize_t read;
+    size_t len = 0;
+    
+    Dictionary* h = d;
+    //if the dictionary is empty, throw an error:
+    if(h->first== NULL){
+        printf("ERROR: Dictionary empty, nothing to save.");
+        return;
+    }
+    //saves the full dictionary in the file
+    int i = 0;
+	while (h != NULL){
+		Pair* x = h->first;
+        strcat(line,x->myKey);
+        strcat(line,": ");
+        strcat(line,x->myDef);
+		if (h->second != NULL){
+			strcat(line,"\n");
+		}		
+		h = (h->second);
+        i++;
+        if(i > 8){
+            fputs(line, fd);
+            i=0;
+            line = "";
+        }
+	}
+    fclose(fd);
+    free(line);
+    return;
 }
 //-----------------------------------------USER INTERFACE------------------------------------------
 
@@ -287,18 +374,23 @@ void ask_for_key(char** key){
     
     if(*key==NULL){
       printf("ERROR: input cannot be null. Try again\n");
+    }else if(strlen(*key) > MAX_KEY_LEN){
+        printf("ERROR: the word is too long. Try again\n");
     }else {return;}
   }
 }
 
 void ask_for_def(char** def){
   while(1){
-    printf("%s", "Please enter the definition corresponding with the word provided: ");
+    printf("%s", "Please enter the definition corresponding with the word provided(max 100 characters): ");
     fgets(*def,100,stdin);
     
     if(*def==NULL){
       printf("ERROR: input cannot be null. Try again\n");
-    }else {return;}
+    } else if(strlen(*def) > MAX_DEF_LEN){
+        printf("ERROR: the definition is too long. Try again\n");
+    }
+    else {return;}
   }
 }
 
@@ -330,8 +422,8 @@ void user_remove(Dictionary* d, char* key){
     dict_remove(d, key);
 }
 
-int user_load(Dictionary* d, char* filename){
-    return loadText(d,filename);
+int user_loadText(Dictionary* d, char* filename){
+    return dict_loadText(d,filename);
 }
 
 void user_display(Dictionary* d){
@@ -344,6 +436,14 @@ int user_change_def(Dictionary* d, char* key, char* def){
 
 char* user_search(Dictionary*d, char* key, char** def){
     return &def;
+}
+
+void user_load_std(Dictionary *d){
+    dict_load(d,STD_FILENAME);
+}
+
+void user_save_std(Dictionary *d){
+    dict_save(d,STD_FILENAME);
 }
 
 int main(int argc, char *argv[]){
@@ -359,7 +459,7 @@ int main(int argc, char *argv[]){
     Dictionary* d = dict();
     
     //load all the words from a previous instance of the program
-    //load_std(d);
+    user_load_std(d);
 
     //-----------------------Main Loop----------------------
     while(run){
@@ -405,7 +505,7 @@ int main(int argc, char *argv[]){
             strcpy(userFileName, userFileNameMal);
             printf("USER FILE NAME: '%s'\n", userFileName);
 
-            if(0 > user_load(d, userFileName)){
+            if(0 > user_loadText(d, userFileName)){
                 printf("%s","ERROR: there was a problem with adding your file, please try again.\n");
             }
 
@@ -446,6 +546,8 @@ int main(int argc, char *argv[]){
         free(userDefMal);
         free(userFileNameMal);
     }
+
+    user_save_std(d);
     
     //----------------------------TESTS-----------------------------------
     
