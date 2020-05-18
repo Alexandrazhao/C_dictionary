@@ -1,7 +1,9 @@
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
-#define DELIM ":\t"
+#define DELIM ":\t\n"
 #define FILENAME  "filename.txt"
 #define STD_FILENAME "test.txt"
 #define STANDARD_DEF "(No definition specified)"
@@ -240,7 +242,7 @@ int dict_load(Dictionary* d, char* filename){
         char* key = strtok(line, DELIM);
         //printf("STRTOK TEST: key= %s\n",key);
         char* def = strtok(NULL, DELIM);
-        //printf("%s", def);
+        printf("I am in load'%s'", def);
     
         if(def == NULL){
             def = STANDARD_DEF;
@@ -319,7 +321,7 @@ int dict_loadText(Dictionary* d, char* filename){
 void dict_save(Dictionary* d, char* filename){
 
     //open the given file and set up access
-    FILE *fd = fopen(filename, "a");
+    FILE *fd = fopen(filename, "w");
     if(fd == NULL){
         printf("ERROR: No save file found.\n");
         return;
@@ -338,15 +340,21 @@ void dict_save(Dictionary* d, char* filename){
     int i = 0;
 	while (h != NULL){
 		Pair* x = h->first;
+
         strcat(line,x->myKey);
-        strcat(line,": ");
+        strcat(line,":");
         strcat(line,x->myDef);
+
+        printf("'%s'\n",x->myDef);
+
 		if (h->second != NULL){
 			strcat(line,"\n");
 		}		
 		h = (h->second);
         i++;
-        if(i > 8){
+
+        if(i > 8 || h == NULL){
+            printf(line);
             fputs(line, fd);
             i=0;
             line = "";
