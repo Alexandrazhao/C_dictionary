@@ -3,15 +3,15 @@ import java.io.*;
 import java.lang.Object;
 
 public class LinkedList {
-    private Node first; // top of stack - most recently added node
+    private static Node first; // top of stack - most recently added node
     private int n; //number of nodes
-    private class Node {
+    private static class Node {
         String key;
         String value;
         Node next;
     }
     
-    public  Node createNode(String key, String value) {
+     public static Node createNode(String key, String value) {
     	Node oldfirst = first;
     	first = new Node();
     	first.key = key;
@@ -21,7 +21,7 @@ public class LinkedList {
     public static void main(String args[]) throws FileNotFoundException{
         System.out.print("I'm in main");
         Stack<Node> dictionary = new Stack<Node>();
-        File file = new File("input.txt");
+        File file = new File("test.txt");
 		Scanner input = new Scanner(file);
 		int n = 0; //number of words in dictionary
 		while (input.hasNext() && n < 5){
