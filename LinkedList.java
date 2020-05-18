@@ -46,10 +46,13 @@ public class LinkedList {
 
 	private static void searchForNode(String key, Stack<Node> stack) {
 		for (int i = 1; i < stack.size(); i++) {
-			Node node1 = stack.get(i);
+			Node node1 = stack.pop();
 			if (node1.key == key) {
+				System.out.println("Node found");
 				printNode(node1);
+				break;
 			} else {
+				System.out.println("Hi, I'm in continue");
 				continue;
 			}
 		}
@@ -66,7 +69,8 @@ public class LinkedList {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		System.out.print("I'm in main\n");
+		//System.out.print("I'm in main\n");
+		long startTime = System.nanoTime();
 		Stack<Node> dictionary = new Stack<Node>();
 		LinkedList dict = new LinkedList();
 		File file = new File("macbeth-processed.txt");
@@ -97,9 +101,19 @@ public class LinkedList {
 			//print(dictionary);
 			//System.out.println("m= " + m);
 			//searchForNode("project", dictionary);
+			/*Node test = new Node();
+			test.key = "you";
+			test.value = null;
+			searchForNode(test, dictionary);*/
 		}
 		input.close();
-		searchForNode("project", dictionary);
+		long endTime = System.nanoTime();
+		long timeElapsed = endTime - startTime;
+		System.out.println("Time elasped of put in miliseconds: " + (timeElapsed)/1000000);
+		System.out.println("Average time of put per argument in nanoseconds: " + timeElapsed/m);
+
+		//searchForNode("you", dictionary);
+		
 		
 	}
 
