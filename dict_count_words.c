@@ -8,7 +8,8 @@
 #define STD_FILENAME "test.txt"
 #define STANDARD_DEF "(No definition specified)"
 #define MAX_DEF_LEN 100
-#define MAX_KEY_LEN 10
+#define MAX_KEY_LEN 20
+#define BUFFER_SIZE_SAVE (100 + 20) * 10
 #define SIZE 100
 
 
@@ -28,8 +29,8 @@ typedef struct Dictionary{
 // "Constructor" for a key-value pair - returns a pointer to a pair.
 Pair* newPair(char* key, char* def, int ID) { 
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
-    p->myKey = (char*)malloc(sizeof(key));
-    p->myDef = (char*)malloc(sizeof(def));
+    p->myKey = (char*)malloc(MAX_KEY_LEN*sizeof(char));
+    p->myDef = (char*)malloc(MAX_DEF_LEN * sizeof(char));
     strncat(p->myKey, key, strlen(key));
     strncat(p->myDef, def, strlen(def));
     p->myID = ID; 
@@ -168,28 +169,23 @@ void dict_add(Dictionary* d, char* key, char* def){
 		new->second = NULL;
 		prev->second = new;
 	}
+    
 }
 /*
     Displays all the words in the dictionary d in a specific format.
 */
 void display_dict(Dictionary* d){
     Dictionary* h = d;
+    printf("-----------------DICTIONARY--------------------\n\n");
     if(h->first== NULL){
-        printf("{}\n");
+        printf("The Dictionary is empty.\n");
         return;
     }
-    printf("{");
 	while (h != NULL){
 		Pair* x = h->first;
-		printf("%s=%d", x->myKey, x->myID);
-		if (h->second != NULL){
-			printf(", ");
-		}		
+		printf("    -%s: '%s'\n", x->myKey, x->myDef);
 		h = (h->second);
-
-	}
-	printf("}");
-	printf("\n");
+    }
 }
 
 // Method for freeing all malloced memory from the dictionary.
@@ -215,6 +211,25 @@ void dict_free(Dictionary* d){
 	}
 }
 
+/*
+
+*/
+char* dict_search(Dictionary* d, char* key){
+    Dictionary* h = d;
+    if(h->first== NULL){
+        return NULL;
+    }
+	while (h != NULL){
+		Pair* x = h->first;
+        if (0 == strcmp(x->myKey, key)){
+            return x->myDef;
+        } else if (h->second == NULL){
+			return NULL;
+		}		
+		h = (h->second);
+	}
+	return NULL;
+}
 /* 
     Takes in an instance of the dictionary (Dictionary* d), and the name of the file that is supposed to
     be accessed (char* filename) and stores all of the words present in the file in the dictionary. Returns
@@ -242,7 +257,6 @@ int dict_load(Dictionary* d, char* filename){
         char* key = strtok(line, DELIM);
         //printf("STRTOK TEST: key= %s\n",key);
         char* def = strtok(NULL, DELIM);
-        printf("I am in load'%s'", def);
     
         if(def == NULL){
             def = STANDARD_DEF;
@@ -326,7 +340,7 @@ void dict_save(Dictionary* d, char* filename){
         printf("ERROR: No save file found.\n");
         return;
     }
-    char *line = (char*)malloc(1000*sizeof(char));
+    char line[BUFFER_SIZE_SAVE];
     ssize_t read;
     size_t len = 0;
     
@@ -345,8 +359,6 @@ void dict_save(Dictionary* d, char* filename){
         strcat(line,":");
         strcat(line,x->myDef);
 
-        printf("'%s'\n",x->myDef);
-
 		if (h->second != NULL){
 			strcat(line,"\n");
 		}		
@@ -357,11 +369,10 @@ void dict_save(Dictionary* d, char* filename){
             printf(line);
             fputs(line, fd);
             i=0;
-            line = "";
+            strcpy(line, "");
         }
 	}
     fclose(fd);
-    free(line);
     return;
 }
 //-----------------------------------------USER INTERFACE------------------------------------------
@@ -442,8 +453,14 @@ int user_change_def(Dictionary* d, char* key, char* def){
     return -1;
 }
 
-char* user_search(Dictionary*d, char* key, char** def){
-    return &def;
+int user_search(Dictionary*d, char* key){
+    char* def = dict_search(d,key);
+    if (NULL == def){
+        return -1;
+    }else{
+        printf("\n    -%s: '%s'\n",key,def);
+        return 1;
+    }
 }
 
 void user_load_std(Dictionary *d){
@@ -477,8 +494,6 @@ int main(int argc, char *argv[]){
 
         show_options();
         fgets(userChoice,100,stdin);
-
-        printf("User choice: %s", userChoice);
     
         if(userChoice==NULL){
           printf("ERROR: input cannot be null");
@@ -541,7 +556,7 @@ int main(int argc, char *argv[]){
             remove_newline(userKeyMal);
             strcpy(userKey, userKeyMal);
 
-            if(0 > user_search(d, userKey,& userDef)){
+            if(0 > user_search(d, userKey)){
                 printf("%s","ERROR: there was a problem with finding your word, please try again.\n");
             }
 
@@ -556,12 +571,6 @@ int main(int argc, char *argv[]){
     }
 
     user_save_std(d);
-    
-    //----------------------------TESTS-----------------------------------
-    
-    //load the words from the file "test.txt" into the created dictionary
-    //load(d, userFileName);
-    //dict_free(d);
-    //close(fd);
     return 0;
+}
 }
