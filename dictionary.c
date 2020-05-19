@@ -1,3 +1,9 @@
+/*
+Created by Karo Krajewska, Michał Cieślik, Yuxuan Zhao
+May 18th 2020
+Principles of Computing Systems - Keith O'hara
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,12 +18,10 @@
 #define BUFFER_SIZE_SAVE (100 + 20) * 10
 #define SIZE 100
 
-
 // Struct for a pair holding a key and a value
 typedef struct Pair{
 	char* myKey;
     char* myDef;
-	int myID;
 }Pair;
 
 // Struct for a dictionary with a pointer to a pair as first and pointer to a dictionary as second
@@ -26,18 +30,21 @@ typedef struct Dictionary{
 	struct Dictionary* second;
 }Dictionary;
 
-// "Constructor" for a key-value pair - returns a pointer to a pair.
-Pair* newPair(char* key, char* def, int ID) { 
+/*
+Returns a pointer to a newly created pair - a "constructor"
+*/
+Pair* newPair(char* key, char* def) { 
     Pair* p =  (Pair*)malloc(sizeof(Pair)); 
     p->myKey = (char*)malloc(MAX_KEY_LEN*sizeof(char));
     p->myDef = (char*)malloc(MAX_DEF_LEN * sizeof(char));
     strncat(p->myKey, key, strlen(key));
     strncat(p->myDef, def, strlen(def));
-    p->myID = ID; 
     return p; 
 } 
 
-// "Constructor" for dictionary - returns a pointer to a dictionary.
+/*
+Returns a pointer to a newly created dictionary - a "constructor"
+*/
 Dictionary* dict(){
 	Dictionary* d = (Dictionary*)malloc(sizeof(Dictionary)); 
 	d->first = NULL;
@@ -46,7 +53,9 @@ Dictionary* dict(){
 }
 
 
-// Method returning the size of a dictionary.
+/*
+Returns the current size of the dictionary.
+*/
 int dict_size(Dictionary* d){
 	int count = 0;
 	if(d->first == NULL){
@@ -60,21 +69,9 @@ int dict_size(Dictionary* d){
 	return count;
 }
 
-// Method returning the value of the given key if that key exists in the dictionary.
-// If the key is not found then -1 is returned.
-int dict_get(Dictionary* d, char* key){
- 	if(d->first == NULL){
- 		return -1;
- 	} 	
- 	Dictionary* tmp = d;
-	while (tmp != NULL){
-		if (strcmp((tmp->first)->myKey, key) == 0){
-			return (tmp->first)->myID;
-		}
-		tmp = tmp->second;
-	}
-	return -1; 
-}
+/*
+Removes the word from the dictionary d based on the key provided.
+*/
 void dict_remove(Dictionary* d, char* key){
     int delete = 0; //a counter for how many words i delete
     Dictionary* temp = d;
@@ -112,36 +109,17 @@ void dict_remove(Dictionary* d, char* key){
     }
 }
 
-/* 
-Creates an int hash code based on the key provided that's based on the ASCII code of up to 3
-    letters of the word, with the empty spaces being filled by 0's
-*/
-int createID(char* key){
-    int tempId = 0;
-    char character;
-    
-    for(int i = 0; i<3; i++){
-        character = key[i];
-        if(i > 0){
-            tempId = tempId * 1000;
-        }
-        tempId += (int)character;
-    }
-    return tempId;
-}
-
 /*
-    Method for adding new pairs into the dictionary
+    Method for adding new pairs into the dictionary with the specified key and def
 */
 void dict_add(Dictionary* d, char* key, char* def){
 	if (key == NULL || def == 0){
 		printf("You cannot use null keyes and values\n");
 		return;
 	}
-    int ID = createID(key);
     
 	// create a pair out of key and value
-	Pair* pair = newPair(key, def, ID);
+	Pair* pair = newPair(key, def);
 	// case when dictionary is empty
 	if (d->first == NULL){
 		d->first = pair;
@@ -157,7 +135,6 @@ void dict_add(Dictionary* d, char* key, char* def){
 		if (strcmp((tmp->first)->myKey, key) == 0){
 			in_dict = 1;
             (tmp->first)->myDef = def;
-			(tmp->first)->myID = ID;
 		}
 		prev = tmp;
 		tmp = tmp->second;
@@ -172,7 +149,7 @@ void dict_add(Dictionary* d, char* key, char* def){
     
 }
 /*
-    Displays all the words in the dictionary d in a specific format.
+Displays all the words in the dictionary d in a specific format.
 */
 void display_dict(Dictionary* d){
     Dictionary* h = d;
@@ -188,8 +165,9 @@ void display_dict(Dictionary* d){
     }
 }
 
-// Method for freeing all malloced memory from the dictionary.
-// At the end makes the dictionary empty.
+/*
+Method for freeing all malloced memory from the dictionary. 
+*/
 void dict_free(Dictionary* d){
 	
 	Dictionary* tmp = d;
@@ -212,7 +190,8 @@ void dict_free(Dictionary* d){
 }
 
 /*
-
+Searches for the word specified in the dictionary d, and returns the definition if found. If the word
+is not found in the dictionary, NULL is returned
 */
 char* dict_search(Dictionary* d, char* key){
     Dictionary* h = d;
@@ -298,7 +277,7 @@ int dict_loadText(Dictionary* d, char* filename){
         //... tokenize it based on the DELIM dividers...
         char* key = strtok(line, DELIM);
         while(key != NULL){
-			
+			/*
 			gettimeofday(&start, NULL);
 			
 			int val = dict_get(d, key);
@@ -307,6 +286,7 @@ int dict_loadText(Dictionary* d, char* filename){
 			}else{
 				dict_add(d, key, val+1);
 			}
+            */
 			gettimeofday(&end, NULL);
 			long long start_msec = start.tv_sec*1000LL + start.tv_usec/1000; // calculate milliseconds
 			long long end_msec = end.tv_sec*1000LL + end.tv_usec/1000; // calculate milliseconds
@@ -320,8 +300,8 @@ int dict_loadText(Dictionary* d, char* filename){
     printf("Time elasped of put in milliseconds: %lld\n", total_elasped);
 	printf("Average time of put per argument in milliseconds %lld\n", (total_elasped)/dict_size(d));
 	gettimeofday(&start, NULL);
-	printf("dict_get(apple): %d\n", dict_get(d, "apple"));
-	printf("dict_get(yes): %d\n", dict_get(d, "yes"));
+	//printf("dict_get(apple): %d\n", dict_get(d, "apple"));
+	//printf("dict_get(yes): %d\n", dict_get(d, "yes"));
 	gettimeofday(&end, NULL);		
 	long long start_msec = start.tv_sec*1000LL + start.tv_usec/1000; // calculate milliseconds
 	long long end_msec = end.tv_sec*1000LL + end.tv_usec/1000; // calculate milliseconds
@@ -332,8 +312,20 @@ int dict_loadText(Dictionary* d, char* filename){
     return 0;
 }
 
-void dict_save(Dictionary* d, char* filename){
+/*
+Changes the defintion of the word by removing the word and re-adding it with the desired def
+*/
+void dict_change_def(Dictionary* d, char* key, char* def){
+    dict_remove(d,key);
+    dict_add(d,key,def);
+}
 
+/*
+Saves the current dictionary into a specified file, so that the user can access the contents of the
+dictionary in between instances of the process
+*/
+void dict_save(Dictionary* d, char* filename){
+    printf("Saving...\n");
     //open the given file and set up access
     FILE *fd = fopen(filename, "w");
     if(fd == NULL){
@@ -353,6 +345,7 @@ void dict_save(Dictionary* d, char* filename){
     //saves the full dictionary in the file
     int i = 0;
 	while (h != NULL){
+        
 		Pair* x = h->first;
 
         strcat(line,x->myKey);
@@ -366,7 +359,6 @@ void dict_save(Dictionary* d, char* filename){
         i++;
 
         if(i > 8 || h == NULL){
-            printf(line);
             fputs(line, fd);
             i=0;
             strcpy(line, "");
@@ -450,7 +442,7 @@ void user_display(Dictionary* d){
 }
 
 int user_change_def(Dictionary* d, char* key, char* def){
-    return -1;
+    dict_change_def(d,key,def);
 }
 
 int user_search(Dictionary*d, char* key){
@@ -572,5 +564,4 @@ int main(int argc, char *argv[]){
 
     user_save_std(d);
     return 0;
-}
 }
